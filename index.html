@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lokum &amp; Baklava Energy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: light, single phone column. Start = logo rings + two big choices. Sim = scrolling results with the counter docked at the bottom, under the thumb. */
+:root{
+  --bg:#F3F8FC; --surface:#FFFFFF; --fg:#1E2B5E; --muted:#5A6790; --line:#DCE6F2;
+  --navy:#283B84; --sky:#4DB3E6; --sun:#FDB913; --sun-deep:#E39B00; --leaf:#3A9A3E;
+  --panel:#E6F4FC; --panel-line:#C6E4F6; --btn-fg:#FFFFFF;
+  --display:"Barlow Condensed","DIN Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+.wrap{max-width:440px;margin:0 auto;padding-block:10px 24px;display:flex;flex-direction:column;gap:14px}
+section.wrap{padding-block:0}
+h1,.num{font-family:var(--display);font-weight:800;text-wrap:balance;margin:0;letter-spacing:.01em}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:10px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:16px;line-height:1;color:var(--navy);background:none;border:0;padding:4px 0;text-align:left}
+.brand b{color:var(--sky);font-weight:700}
+.brand svg{width:34px;height:34px}
+.lang{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.lang button{border:0;background:none;min-width:44px;min-height:36px;padding:0 12px;font-weight:600;font-size:14px;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--navy);color:var(--btn-fg)}
+
+/* Start screen */
+.hero{position:relative;width:min(100%,46vh,360px);margin:0 auto;aspect-ratio:1/1}
+.hero svg.rings{position:absolute;inset:0;width:100%;height:100%;animation:spin 60s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero .inner{position:absolute;inset:17%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--sky)}
+.hero h1{font-size:clamp(28px,min(9vw,5.2vh),44px);line-height:.95;color:var(--navy);text-transform:uppercase}
+.qsub{color:var(--muted);font-size:16px;max-width:30ch;margin:0 auto;text-align:center}
+.lead{text-align:center;font-family:var(--display);font-weight:700;font-size:21px;color:var(--fg)}
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pick{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:12px 8px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;
+  box-shadow:0 4px 14px rgba(40,59,132,.08);transition:transform .15s,border-color .15s;touch-action:manipulation}
+.pick:active{transform:scale(.97);border-color:var(--sky)}
+.pick svg{width:min(96px,24vw);height:min(96px,24vw)}
+.pick .name{font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase;color:var(--navy);line-height:1}
+.pick .tap{font-size:13px;color:var(--muted)}
+
+/* Simulation: content scrolls, counter is docked */
+#sim{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
+.same{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:10px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:4px;text-align:center}
+.same figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.same svg{width:64px;height:64px}
+.same figcaption{font-size:12.5px;color:var(--muted);line-height:1.25}
+.same figcaption strong{display:block;color:var(--fg);font-size:14px}
+.same .eq{font-family:var(--display);font-weight:800;font-size:28px;color:var(--sky)}
+
+.result{background:var(--panel);border:1.5px solid var(--panel-line);border-radius:22px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px}
+.result .pre{font-weight:600;font-size:17px;line-height:1.3;color:var(--fg);text-wrap:balance}
+.result .pre b{color:var(--navy);font-weight:700}
+.result .big{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-top:-4px}
+.result .num{font-size:clamp(60px,19vw,88px);line-height:.85;color:var(--navy);font-variant-numeric:tabular-nums}
+.result .unit{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.05;text-transform:uppercase;max-width:14ch;color:var(--navy);padding-bottom:2px}
+.milestone{font-weight:600;font-size:15px;min-height:1.4em;color:var(--fg)}
+.milestone:not(:empty)::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--sun);margin-right:8px;vertical-align:middle}
+.street{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.street svg{width:100%;height:auto;display:block}
+.street .h.pop{animation:pop .35s ease-out backwards}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.legend{font-size:13px;color:var(--muted)}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat .num{font-size:36px;line-height:1;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.stat.coal .num{color:var(--fg)}
+.stat.co2 .num{color:var(--leaf)}
+.stat p{font-size:13.5px;color:var(--muted);line-height:1.3}
+
+.switch{align-self:center;background:var(--surface);border:2px solid var(--navy);color:var(--navy);border-radius:999px;min-height:44px;padding:0 20px;font-weight:600}
+details{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:0 16px}
+summary{cursor:pointer;padding:13px 0;font-weight:600;color:var(--navy);list-style-position:inside}
+details ul{margin:0 0 14px;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+details li strong{color:var(--fg);font-weight:600}
+.foot{text-align:center;font-size:12px;color:var(--muted)}
+
+/* Docked counter */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border-top:1.5px solid var(--line);box-shadow:0 -6px 20px rgba(40,59,132,.08);
+  padding:8px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dock-in{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.counter{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px}
+.mid{display:flex;flex-direction:column;align-items:center;min-width:0;text-align:center}
+.count{font-family:var(--display);font-weight:800;font-size:52px;line-height:.95;color:var(--navy);font-variant-numeric:tabular-nums}
+.count.bump{animation:bump .25s}
+@keyframes bump{40%{transform:scale(1.12)}}
+.countLabel{font-weight:600;font-size:13.5px;line-height:1.2;color:var(--muted)}
+.round{border-radius:50%;border:0;display:grid;place-items:center;font-family:var(--display);font-weight:800;line-height:1;
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;transition:transform .08s,box-shadow .08s}
+.round.plus{width:76px;height:76px;font-size:46px;background:var(--navy);color:var(--btn-fg);box-shadow:0 5px 0 #18245A}
+.round.plus:active{box-shadow:0 1px 0 #18245A;transform:translateY(4px)}
+.round.minus{width:56px;height:56px;font-size:34px;background:var(--surface);color:var(--navy);border:2px solid var(--line)}
+.round.minus:active{transform:scale(.92)}
+.round:disabled{opacity:.35;cursor:default}
+.chips{display:flex;gap:8px;justify-content:center}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;min-height:34px;padding:0 14px;font-weight:600;font-size:14px;color:var(--navy);touch-action:manipulation}
+.chip:active{background:var(--panel)}
+.hint{font-size:13px;color:var(--muted);text-align:center}
+
+@media (prefers-reduced-motion: reduce){
+  .hero svg.rings{animation:none}
+  .count.bump,.street .h.pop{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <button class="brand" id="home" type="button" aria-label="Start">
+      <svg viewBox="0 0 200 200" aria-hidden="true" class="mini-rings"></svg>
+      <span><b data-t="brand1"></b><br><span data-t="brand2"></span></span>
+    </button>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="lang-tr" data-lang="tr">TR</button>
+      <button type="button" id="lang-en" data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <!-- START -->
+  <section id="start" class="wrap">
+    <div class="hero">
+      <svg class="rings" viewBox="0 0 200 200" aria-hidden="true"></svg>
+      <div class="inner">
+        <span class="eyebrow">COP31 · Türkiye</span>
+        <h1 data-t="q"></h1>
+      </div>
+    </div>
+    <p class="qsub" data-t="qsub"></p>
+    <p class="lead" data-t="pick"></p>
+    <div class="choose">
+      <button class="pick" type="button" id="pick-lokum" data-sweet="lokum">
+        <svg viewBox="0 0 100 100" data-draw="lokum" aria-hidden="true"></svg>
+        <span class="name">Lokum</span>
+        <span class="tap" data-t="tapme"></span>
+      </button>
+      <button class="pick" type="button" id="pick-baklava" data-sweet="baklava">
+        <svg viewBox="0 0 100 100" data-draw="baklava" aria-hidden="true"></svg>
+        <span class="name">Baklava</span>
+        <span class="tap" data-t="tapme"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- SIMULATION -->
+  <section id="sim" class="wrap" hidden>
+    <div class="same">
+      <figure>
+        <svg viewBox="0 0 100 100" id="sweetPic" aria-hidden="true"></svg>
+        <figcaption><strong id="sweetName"></strong><span id="sweetWeight"></span></figcaption>
+      </figure>
+      <span class="eq" aria-hidden="true">=</span>
+      <figure>
+        <svg viewBox="0 0 100 100" id="fuelPic" aria-hidden="true"></svg>
+        <figcaption><strong data-t="fuel"></strong><span id="fuelWeight"></span></figcaption>
+      </figure>
+    </div>
+
+    <p class="hint" data-t="hint"></p>
+
+    <div class="result">
+      <p class="pre" id="pre"></p>
+      <div class="big">
+        <span class="num" id="homes">0</span>
+        <span class="unit" data-t="homesUnit"></span>
+      </div>
+      <p class="milestone" id="milestone"></p>
+      <div class="street" id="street" aria-hidden="true"></div>
+      <p class="legend" id="legend"></p>
+    </div>
+
+    <div class="stats">
+      <div class="stat coal"><span class="num" id="coal">0</span><p data-t="coal"></p></div>
+      <div class="stat co2"><span class="num" id="co2">0</span><p data-t="co2"></p></div>
+    </div>
+
+    <button class="switch" type="button" id="switch"></button>
+
+    <details id="how">
+      <summary data-t="how"></summary>
+      <ul id="howList"></ul>
+    </details>
+    <p class="foot">Nuclear for Climate · COP31</p>
+  </section>
+</div>
+
+  <div class="dock" id="dock" hidden>
+    <div class="dock-in">
+      <div class="counter">
+        <button class="round minus" type="button" id="minus" aria-label="−1">−</button>
+        <div class="mid">
+          <span class="count" id="count" aria-live="polite">1</span>
+          <span class="countLabel" id="countLabel"></span>
+        </div>
+        <button class="round plus" type="button" id="plus" aria-label="+1">+</button>
+      </div>
+      <div class="chips">
+        <button class="chip" type="button" id="plus10">+10</button>
+        <button class="chip" type="button" id="plus100">+100</button>
+        <button class="chip" type="button" id="reset" data-t="reset"></button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------- Physics (kept simple, all assumptions listed in "How we worked it out") ----------
+  const FUEL_DENSITY = 10.4;      // g/cm³, uranium dioxide fuel pellet
+  const U_SHARE = 0.8815;         // mass share of uranium in UO2
+  const BURNUP = 45;              // MWd of heat per kg of uranium (typical light-water reactor)
+  const EFFICIENCY = 0.33;        // heat -> electricity
+  const HOME_KWH = 2400;          // electricity per Turkish household per year (approx.)
+  const COAL_KWH_PER_T = 2500;    // electricity from 1 tonne of coal
+  const CO2_SAVED = 0.808;        // kg CO2 per kWh: coal 820 g vs nuclear 12 g (IPCC lifecycle medians)
+  const KWH_PER_G = U_SHARE / 1000 * BURNUP * 24 * 1000 * EFFICIENCY; // ≈ 314 kWh per gram of fuel
+
+  const SWEETS = {
+    lokum:   { vol: 2.5 * 2.5 * 2.5, sweetG: 20, size: "2.5 × 2.5 × 2.5 cm" },
+    baklava: { vol: 4 * 4 * 2.5,     sweetG: 40, size: "4 × 4 × 2.5 cm" }
+  };
+  for (const s of Object.values(SWEETS)) {
+    s.fuelG = s.vol * FUEL_DENSITY;
+    s.kwh = s.fuelG * KWH_PER_G;
+  }
+
+  // ---------- Text ----------
+  const T = {
+    en: {
+      brand1: "Nuclear for", brand2: "CLIMATE",
+      q: "How much energy fits in a sweet?",
+      qsub: "Pick your favourite sweet. See how much electricity a uranium pellet of the same size can make.",
+      pick: "Lokum or baklava?", tapme: "Tap to choose",
+      fuel: "Uranium pellet of the same size",
+      sweetW: g => `about ${g} g of sweet`, fuelW: g => `about ${g} g of uranium`,
+      countLabel: (n, s) => `${s}-sized uranium ${n === 1 ? "pellet" : "pellets"}`,
+      pre: (n, s) => n === 1 ? `A uranium pellet the size of <b>one ${s}</b> can power` : `<b>${fmt(n)} uranium pellets</b>, each the size of a ${s}, can power`,
+      hint: "Tap + to add one more piece. Hold it down to go faster.",
+      reset: "Back to 1",
+      homesUnit: "homes for a whole year",
+      coal: "tonnes of coal it replaces", co2: "tonnes of CO₂ kept out of the air",
+      legend: u => u === 1 ? "Each house = 1 home" : `Each house = ${fmt(u)} homes`,
+      switchTo: s => `Try it with ${s === "lokum" ? "lokum" : "baklava"}`,
+      how: "How we worked it out",
+      miles: [[1,"A home's lights, fridge and tea kettle, all year."],[20,"A whole apartment block."],[50,"A whole street."],[250,"A whole mahalle."],[1000,"A small town."],[10000,"A whole ilçe."],[100000,"A city the size of Antalya's centre."]],
+      howList: [
+        s => `<strong>Your sweet:</strong> a ${s.size} piece, about ${s.sweetG} g.`,
+        s => `<strong>Same size in fuel:</strong> uranium dioxide pellets weigh ${FUEL_DENSITY} g per cm³, so the same piece weighs about ${fmt(Math.round(s.fuelG))} g.`,
+        () => `<strong>Energy:</strong> in a typical reactor, 1 g of this fuel makes about ${fmt(Math.round(KWH_PER_G))} kWh of electricity.`,
+        () => `<strong>Homes:</strong> a Turkish household uses about ${fmt(HOME_KWH)} kWh of electricity a year.`,
+        () => `<strong>Coal and CO₂:</strong> 1 tonne of coal makes about ${fmt(COAL_KWH_PER_T)} kWh. Coal power emits about 820 g CO₂ per kWh over its life cycle; nuclear about 12 g (IPCC).`,
+        () => `Figures are rounded and meant to give a feel for scale.`
+      ]
+    },
+    tr: {
+      brand1: "Nuclear for", brand2: "CLIMATE",
+      q: "Bir tatlıya ne kadar enerji sığar?",
+      qsub: "Favori tatlını seç. Aynı büyüklükteki bir uranyum peletinin ne kadar elektrik üretebileceğini gör.",
+      pick: "Lokum mu, baklava mı?", tapme: "Seçmek için dokun",
+      fuel: "Aynı büyüklükte uranyum peleti",
+      sweetW: g => `yaklaşık ${g} g tatlı`, fuelW: g => `yaklaşık ${g} g uranyum`,
+      countLabel: (n, s) => `${s} büyüklüğünde uranyum peleti`,
+      pre: (n, s) => { const w = s === "lokum" ? "bir lokum" : "bir dilim baklava"; return n === 1 ? `<b>${w[0].toUpperCase() + w.slice(1)}</b> büyüklüğündeki bir uranyum peleti` : `Her biri ${w} büyüklüğündeki <b>${fmt(n)} uranyum peleti</b>`; },
+      hint: "Bir parça daha eklemek için + tuşuna dokun. Hızlanmak için basılı tut.",
+      reset: "1'e dön",
+      homesUnit: "evin bir yıllık elektriğini karşılar",
+      coal: "ton kömürün yerini alır", co2: "ton CO₂ havaya karışmaz",
+      legend: u => u === 1 ? "Her ev simgesi = 1 hane" : `Her ev simgesi = ${fmt(u)} hane`,
+      switchTo: s => `Bir de ${s === "lokum" ? "lokumla" : "baklavayla"} dene`,
+      how: "Nasıl hesapladık?",
+      miles: [[1,"Bir evin ışığı, buzdolabı ve çaydanlığı, bütün yıl."],[20,"Koca bir apartman."],[50,"Bütün bir sokak."],[250,"Koca bir mahalle."],[1000,"Küçük bir kasaba."],[10000,"Bütün bir ilçe."],[100000,"Antalya merkezi büyüklüğünde bir şehir."]],
+      howList: [
+        s => `<strong>Tatlın:</strong> ${s.size} boyutunda bir parça, yaklaşık ${s.sweetG} g.`,
+        s => `<strong>Aynı boyutta yakıt:</strong> uranyum dioksit peletleri cm³ başına ${String(FUEL_DENSITY).replace(".", ",")} g gelir; aynı parça yaklaşık ${fmt(Math.round(s.fuelG))} g olur.`,
+        () => `<strong>Enerji:</strong> tipik bir reaktörde bu yakıtın 1 gramı yaklaşık ${fmt(Math.round(KWH_PER_G))} kWh elektrik üretir.`,
+        () => `<strong>Haneler:</strong> Türkiye'de bir hane yılda yaklaşık ${fmt(HOME_KWH)} kWh elektrik kullanır.`,
+        () => `<strong>Kömür ve CO₂:</strong> 1 ton kömürden yaklaşık ${fmt(COAL_KWH_PER_T)} kWh elektrik elde edilir. Kömür, yaşam döngüsü boyunca kWh başına yaklaşık 820 g CO₂ salar; nükleer yaklaşık 12 g (IPCC).`,
+        () => `Rakamlar yuvarlanmıştır; amaç ölçeği hissettirmektir.`
+      ]
+    }
+  };
+
+  let lang = "en";
+  try { lang = localStorage.getItem("n4c-lang") || ((navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en"); } catch (e) {
+    lang = (navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en";
+  }
+  let sweet = null, n = 1;
+  const shown = { homes: 0, coal: 0, co2: 0 };
+
+  function fmt(x, d = 0) {
+    return new Intl.NumberFormat(lang === "tr" ? "tr-TR" : "en-GB", { maximumFractionDigits: d, minimumFractionDigits: d }).format(x);
+  }
+  const $ = id => document.getElementById(id);
+
+  // ---------- Drawings ----------
+  const RING_COLORS = ["#7DC242","#5B2D6E","#E2231A","#FDB913","#4DB3E6","#3A9A3E","#C2187A","#283B84"];
+  function rings(svg, sw) {
+    const shapes = [[-4,-6,90,88,20],[2,-3,93,90,-35],[3,2,90,92,60],[5,-2,92,89,10],[-2,1,94,92,-10],[-3,3,89,90,45],[-5,4,88,91,-60],[4,5,91,93,80]];
+    svg.innerHTML = shapes.map((s, i) =>
+      `<ellipse cx="${100+s[0]}" cy="${100+s[1]}" rx="${s[2]}" ry="${s[3]}" transform="rotate(${s[4]} 100 100)" fill="none" stroke="${RING_COLORS[i]}" stroke-width="${sw}"/>`
+    ).join("");
+  }
+
+  // isometric block: w = half-width, top y, depth of top face, height of sides
+  function block(p, flat) {
+    const cx = 50, top = flat ? 22 : 12, hw = flat ? 40 : 36, hd = flat ? 18 : 18, h = flat ? 22 : 38;
+    const T0 = [cx, top], R = [cx + hw, top + hd], B = [cx, top + 2 * hd], L = [cx - hw, top + hd];
+    const pts = a => a.map(q => q.join(",")).join(" ");
+    const down = q => [q[0], q[1] + h];
+    let s = `<ellipse cx="50" cy="${top + 2*hd + h + 4}" rx="${hw}" ry="5" fill="#000" opacity=".12"/>`;
+    s += `<polygon points="${pts([L, B, down(B), down(L)])}" fill="${p.left}"/>`;
+    s += `<polygon points="${pts([B, R, down(R), down(B)])}" fill="${p.right}"/>`;
+    s += `<polygon points="${pts([T0, R, B, L])}" fill="${p.top}"/>`;
+    if (p.layers) { // baklava pastry layers on the sides
+      for (let k = 1; k < 6; k++) {
+        const y = h * k / 6;
+        s += `<polyline points="${L[0]},${L[1]+y} ${B[0]},${B[1]+y} ${R[0]},${R[1]+y}" fill="none" stroke="${p.layers}" stroke-width="1.6" opacity=".8"/>`;
+      }
+      s += `<polyline points="${L[0]},${L[1]+h*.45} ${B[0]},${B[1]+h*.45} ${R[0]},${R[1]+h*.45}" fill="none" stroke="#7DB343" stroke-width="2.4"/>`;
+    }
+    if (p.crumbs) { // pistachio on top
+      const c = [[50,28],[40,33],[60,33],[50,38],[32,40],[68,40],[44,44],[56,44],[50,50],[38,46],[62,46],[50,34]];
+      s += c.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="2.3" fill="${p.crumbs}"/>`).join("");
+    }
+    if (p.sugar) {
+      const c = [[44,22],[58,26],[50,32],[36,30],[64,32],[46,40],[56,38],[24,40],[30,52],[22,60],[34,66],[28,74],[72,44],[76,56],[66,62],[72,72]];
+      s += c.map(([x,y]) => `<circle cx="${x}" cy="${y}" r="1.3" fill="#fff" opacity=".9"/>`).join("");
+    }
+    if (p.shine) {
+      s += `<polygon points="${pts([[cx-6,top+6],[cx+14,top+16],[cx+8,top+19],[cx-12,top+9]])}" fill="#fff" opacity=".25"/>`;
+    }
+    return s;
+  }
+  const PAL = {
+    lokum:   { top:"#F8B9CF", left:"#E27BA2", right:"#C55985", sugar:true },
+    baklava: { top:"#E2A33A", left:"#F1C46A", right:"#D39A3A", layers:"#B57A24", crumbs:"#6FA83A" },
+    fuel:    { top:"#8A93A3", left:"#5D6676", right:"#454D5B", shine:true }
+  };
+  const draw = (svg, kind, flat) => svg.innerHTML = block(PAL[kind], flat);
+
+  const HOUSE = (on) => `<svg viewBox="0 0 24 24"><path d="M3 11 L12 4 L21 11 V21 H3 Z" fill="#FDB913" stroke="#E39B00" stroke-width="1.2" stroke-linejoin="round"/>${on ? '<rect x="7" y="13" width="4" height="4" fill="#283B84" opacity=".55"/><rect x="13" y="13" width="4" height="4" fill="#283B84" opacity=".55"/>' : ""}</svg>`;
+
+  // ---------- Render ----------
+  function applyText() {
+    const t = T[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-t]").forEach(el => { const v = t[el.dataset.t]; if (typeof v === "string") el.textContent = v; });
+    $("lang-tr").setAttribute("aria-pressed", lang === "tr");
+    $("lang-en").setAttribute("aria-pressed", lang === "en");
+    if (sweet) renderSim(false);
+  }
+
+  function animate(key, el, to, d) {
+    const from = shown[key], start = performance.now(), dur = 450;
+    shown[key] = to;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { el.textContent = fmt(to, d); return; }
+    const step = now => {
+      const k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3);
+      const v = from + (to - from) * e;
+      el.textContent = fmt(d ? v : Math.round(v), d);
+      if (k < 1 && shown[key] === to) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  let lastIcons = 0, lastUnit = 1;
+  function renderStreet(homes) {
+    let unit = 1;
+    while (homes / unit > 60) unit *= 10;
+    const icons = Math.max(1, Math.round(homes / unit));
+    const street = $("street");
+    if (unit !== lastUnit || icons < lastIcons) { street.innerHTML = ""; lastIcons = 0; }
+    for (let i = lastIcons; i < icons; i++) {
+      const d = document.createElement("div");
+      d.className = "h pop";
+      d.style.animationDelay = (Math.min(i - lastIcons, 20) * 18) + "ms";
+      d.innerHTML = HOUSE(true);
+      street.appendChild(d);
+    }
+    lastIcons = icons; lastUnit = unit;
+    $("legend").textContent = T[lang].legend(unit);
+  }
+
+  function renderSim(bump = true) {
+    const t = T[lang], s = SWEETS[sweet];
+    const kwh = s.kwh * n, homes = Math.round(kwh / HOME_KWH);
+    const coal = kwh / COAL_KWH_PER_T, co2 = kwh * CO2_SAVED / 1000;
+
+    $("count").textContent = fmt(n);
+    if (bump) { const c = $("count"); c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump"); }
+    $("countLabel").textContent = t.countLabel(n, sweet);
+    $("pre").innerHTML = t.pre(n, sweet);
+    $("minus").disabled = n <= 1;
+    $("sweetName").textContent = sweet === "lokum" ? "Lokum" : "Baklava";
+    $("sweetWeight").textContent = t.sweetW(s.sweetG);
+    $("fuelWeight").textContent = t.fuelW(fmt(Math.round(s.fuelG / 10) * 10));
+    animate("homes", $("homes"), homes, 0);
+    animate("coal", $("coal"), coal, coal < 10 ? 1 : 0);
+    animate("co2", $("co2"), co2, co2 < 10 ? 1 : 0);
+    let m = ""; for (const [k, v] of t.miles) if (homes >= k) m = v;
+    $("milestone").textContent = m;
+    renderStreet(homes);
+    $("switch").textContent = t.switchTo(sweet === "lokum" ? "baklava" : "lokum");
+    $("howList").innerHTML = t.howList.map(f => `<li>${f(s)}</li>`).join("");
+  }
+
+  function go(which) {
+    if (which && SWEETS[which]) {
+      sweet = which; n = 1;
+      shown.homes = shown.coal = shown.co2 = 0;
+      $("street").innerHTML = ""; lastIcons = 0; lastUnit = 1;
+      draw($("sweetPic"), which, which === "baklava");
+      draw($("fuelPic"), "fuel", which === "baklava");
+      $("start").hidden = true; $("sim").hidden = false; $("dock").hidden = false;
+      renderSim(false);
+      window.scrollTo(0, 0);
+    } else {
+      sweet = null; $("sim").hidden = true; $("dock").hidden = true; $("start").hidden = false;
+    }
+  }
+
+  function setN(v) {
+    n = Math.max(1, Math.min(99999, v));
+    renderSim(true);
+    try { navigator.vibrate && navigator.vibrate(6); } catch (e) {}
+  }
+
+  // tap = +1, hold = repeat, getting faster
+  function holdable(btn, fn) {
+    let timer = null;
+    const stop = () => { clearTimeout(timer); timer = null; };
+    btn.addEventListener("pointerdown", e => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      fn();
+      let delay = 380;
+      const loop = () => { timer = setTimeout(() => { fn(); delay = Math.max(45, delay * 0.82); loop(); }, delay); };
+      loop();
+    });
+    ["pointerup", "pointerleave", "pointercancel", "blur"].forEach(ev => btn.addEventListener(ev, stop));
+    btn.addEventListener("contextmenu", e => e.preventDefault());
+    btn.addEventListener("click", e => { if (e.detail === 0) fn(); }); // keyboard
+  }
+
+  // ---------- Wire up ----------
+  rings(document.querySelector(".hero .rings"), 1.6);
+  rings(document.querySelector(".mini-rings"), 4);
+  document.querySelectorAll("[data-draw]").forEach(svg => draw(svg, svg.dataset.draw, svg.dataset.draw === "baklava"));
+
+  document.querySelectorAll(".pick").forEach(b => b.addEventListener("click", () => { location.hash = b.dataset.sweet; }));
+  $("home").addEventListener("click", () => { history.replaceState(null, "", location.pathname + location.search); go(null); });
+  $("switch").addEventListener("click", () => { location.hash = sweet === "lokum" ? "baklava" : "lokum"; });
+  holdable($("plus"), () => setN(n + 1));
+  holdable($("minus"), () => setN(n - 1));
+  $("plus10").addEventListener("click", () => setN(n + 10));
+  $("plus100").addEventListener("click", () => setN(n + 100));
+  $("reset").addEventListener("click", () => setN(1));
+  document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => {
+    lang = b.dataset.lang;
+    try { localStorage.setItem("n4c-lang", lang); } catch (e) {}
+    applyText();
+  }));
+  window.addEventListener("hashchange", () => go(location.hash.slice(1)));
+
+  applyText();
+  go(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
