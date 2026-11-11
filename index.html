@@ -7,15 +7,15 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 /* Layout: light, single phone column. Start = logo rings + two big choices. Sim = scrolling results with the counter docked at the bottom, under the thumb. */
 :root{
   --bg:#F3F8FC; --surface:#FFFFFF; --fg:#1E2B5E; --muted:#5A6790; --line:#DCE6F2;
   --navy:#283B84; --sky:#4DB3E6; --sun:#FDB913; --sun-deep:#E39B00; --leaf:#3A9A3E;
   --panel:#E6F4FC; --panel-line:#C6E4F6; --btn-fg:#FFFFFF;
-  --display:"Barlow Condensed","DIN Condensed","Arial Narrow",system-ui,sans-serif;
-  --body:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
+  --display:"Barlow Condensed","Cairo","DIN Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow","Cairo","Segoe UI",system-ui,-apple-system,sans-serif;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -32,7 +32,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:10px}
 
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
-.brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:16px;line-height:1;color:var(--navy);background:none;border:0;padding:4px 0;text-align:left}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;font-size:16px;line-height:1;color:var(--navy);background:none;border:0;padding:4px 0;text-align:start}
 .brand b{color:var(--sky);font-weight:700}
 .brand svg{width:34px;height:34px}
 .lang{display:flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
@@ -72,7 +72,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
 .result .num{font-size:clamp(60px,19vw,88px);line-height:.85;color:var(--navy);font-variant-numeric:tabular-nums}
 .result .unit{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.05;text-transform:uppercase;max-width:14ch;color:var(--navy);padding-bottom:2px}
 .milestone{font-weight:600;font-size:15px;min-height:1.4em;color:var(--fg)}
-.milestone:not(:empty)::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--sun);margin-right:8px;vertical-align:middle}
+.milestone:not(:empty)::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--sun);margin-inline-end:8px;vertical-align:middle}
 .street{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
 .street svg{width:100%;height:auto;display:block}
 .street .h.pop{animation:pop .35s ease-out backwards}
@@ -89,7 +89,7 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-
 .switch{align-self:center;background:var(--surface);border:2px solid var(--navy);color:var(--navy);border-radius:999px;min-height:44px;padding:0 20px;font-weight:600}
 details{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:0 16px}
 summary{cursor:pointer;padding:13px 0;font-weight:600;color:var(--navy);list-style-position:inside}
-details ul{margin:0 0 14px;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+details ul{margin:0 0 14px;padding-inline-start:18px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
 details li strong{color:var(--fg);font-weight:600}
 .foot{text-align:center;font-size:12px;color:var(--muted)}
 
@@ -116,6 +116,14 @@ details li strong{color:var(--fg);font-weight:600}
 .chip:active{background:var(--panel)}
 .hint{font-size:13px;color:var(--muted);text-align:center}
 
+/* Arabic: keep + under the right thumb, give Arabic script room to breathe */
+.counter{direction:ltr}
+[dir="rtl"] .counter .mid{direction:rtl}
+:lang(ar) .hero h1{line-height:1.25;font-size:clamp(26px,min(8vw,4.6vh),38px)}
+:lang(ar) .result .unit{line-height:1.3;font-size:20px}
+:lang(ar) .pick .name{font-size:24px}
+:lang(ar) .result .pre{font-size:17px;line-height:1.6}
+
 @media (prefers-reduced-motion: reduce){
   .hero svg.rings{animation:none}
   .count.bump,.street .h.pop{animation:none}
@@ -133,6 +141,7 @@ details li strong{color:var(--fg);font-weight:600}
     <div class="lang" role="group" aria-label="Language">
       <button type="button" id="lang-tr" data-lang="tr">TR</button>
       <button type="button" id="lang-en" data-lang="en">EN</button>
+      <button type="button" id="lang-ar" data-lang="ar" lang="ar">عربي</button>
     </div>
   </header>
 
@@ -150,12 +159,12 @@ details li strong{color:var(--fg);font-weight:600}
     <div class="choose">
       <button class="pick" type="button" id="pick-lokum" data-sweet="lokum">
         <svg viewBox="0 0 100 100" data-draw="lokum" aria-hidden="true"></svg>
-        <span class="name">Lokum</span>
+        <span class="name" data-name="lokum">Lokum</span>
         <span class="tap" data-t="tapme"></span>
       </button>
       <button class="pick" type="button" id="pick-baklava" data-sweet="baklava">
         <svg viewBox="0 0 100 100" data-draw="baklava" aria-hidden="true"></svg>
-        <span class="name">Baklava</span>
+        <span class="name" data-name="baklava">Baklava</span>
         <span class="tap" data-t="tapme"></span>
       </button>
     </div>
@@ -255,6 +264,7 @@ details li strong{color:var(--fg);font-weight:600}
       pre: (n, s) => n === 1 ? `A uranium pellet the size of <b>one ${s}</b> can power` : `<b>${fmt(n)} uranium pellets</b>, each the size of a ${s}, can power`,
       hint: "Tap + to add one more piece. Hold it down to go faster.",
       reset: "Back to 1",
+      names: { lokum: "Lokum", baklava: "Baklava" },
       homesUnit: "homes for a whole year",
       coal: "tonnes of coal it replaces", co2: "tonnes of CO₂ kept out of the air",
       legend: u => u === 1 ? "Each house = 1 home" : `Each house = ${fmt(u)} homes`,
@@ -281,6 +291,7 @@ details li strong{color:var(--fg);font-weight:600}
       pre: (n, s) => { const w = s === "lokum" ? "bir lokum" : "bir dilim baklava"; return n === 1 ? `<b>${w[0].toUpperCase() + w.slice(1)}</b> büyüklüğündeki bir uranyum peleti` : `Her biri ${w} büyüklüğündeki <b>${fmt(n)} uranyum peleti</b>`; },
       hint: "Bir parça daha eklemek için + tuşuna dokun. Hızlanmak için basılı tut.",
       reset: "1'e dön",
+      names: { lokum: "Lokum", baklava: "Baklava" },
       homesUnit: "evin bir yıllık elektriğini karşılar",
       coal: "ton kömürün yerini alır", co2: "ton CO₂ havaya karışmaz",
       legend: u => u === 1 ? "Her ev simgesi = 1 hane" : `Her ev simgesi = ${fmt(u)} hane`,
@@ -295,18 +306,48 @@ details li strong{color:var(--fg);font-weight:600}
         () => `<strong>Kömür ve CO₂:</strong> 1 ton kömürden yaklaşık ${fmt(COAL_KWH_PER_T)} kWh elektrik elde edilir. Kömür, yaşam döngüsü boyunca kWh başına yaklaşık 820 g CO₂ salar; nükleer yaklaşık 12 g (IPCC).`,
         () => `Rakamlar yuvarlanmıştır; amaç ölçeği hissettirmektir.`
       ]
+    },
+    ar: {
+      brand1: "Nuclear for", brand2: "CLIMATE",
+      q: "كم من الطاقة تتّسع لها قطعة حلوى؟",
+      qsub: "اختر حلواك المفضّلة، واكتشف كم من الكهرباء يمكن أن تنتجه حبيبة يورانيوم بالحجم نفسه.",
+      pick: "لوكوم أم بقلاوة؟", tapme: "اضغط للاختيار",
+      fuel: "حبيبة يورانيوم بالحجم نفسه",
+      sweetW: g => `نحو ${g} غ من الحلوى`, fuelW: g => `نحو ${g} غ من اليورانيوم`,
+      countLabel: (n, s) => `${n === 1 ? "حبيبة يورانيوم" : "حبيبات يورانيوم"} بحجم قطعة ${s === "lokum" ? "لوكوم" : "بقلاوة"}`,
+      pre: (n, s) => { const w = s === "lokum" ? "لوكوم" : "بقلاوة"; return n === 1 ? `حبيبة يورانيوم واحدة بحجم <b>قطعة ${w}</b> يمكنها أن تزوّد` : `<b>${fmt(n)} حبيبات يورانيوم</b>، كلٌّ منها بحجم قطعة ${w}، يمكنها أن تزوّد`; },
+      hint: "اضغط + لإضافة قطعة أخرى. اضغط مطوّلًا لتسريع العدّ.",
+      reset: "العودة إلى 1",
+      names: { lokum: "لوكوم", baklava: "بقلاوة" },
+      homesUnit: "منزلًا بالكهرباء لعام كامل",
+      homesUnitFn: h => { const r = h % 100; return (h >= 3 && h <= 10 ? "منازل" : (r >= 11 && r <= 99 ? "منزلًا" : "منزل")) + " بالكهرباء لعام كامل"; },
+      coal: "طن من الفحم يُستغنى عنه", co2: "طن من ثاني أكسيد الكربون لا ينبعث في الهواء",
+      legend: u => u === 1 ? "كل رمز = منزل واحد" : `كل رمز = ${fmt(u)} منزل`,
+      switchTo: s => `جرّبها مع ${s === "lokum" ? "اللوكوم" : "البقلاوة"}`,
+      how: "كيف حسبنا ذلك؟",
+      miles: [[1,"إنارة منزل وثلاجته وإبريق الشاي طوال العام."],[20,"عمارة سكنية كاملة."],[50,"شارع كامل."],[250,"حيّ كامل."],[1000,"بلدة صغيرة."],[10000,"منطقة كاملة."],[100000,"مدينة بحجم وسط أنطاليا."]],
+      howList: [
+        s => `<strong>حلواك:</strong> قطعة بأبعاد <span dir="ltr">${s.size}</span>، وزنها نحو ${s.sweetG} غ.`,
+        s => `<strong>الحجم نفسه من الوقود:</strong> تزن حبيبات ثاني أكسيد اليورانيوم ${FUEL_DENSITY} غ لكل سم³، لذا تزن القطعة نفسها نحو ${fmt(Math.round(s.fuelG))} غ.`,
+        () => `<strong>الطاقة:</strong> في مفاعل نموذجي، ينتج غرام واحد من هذا الوقود نحو ${fmt(Math.round(KWH_PER_G))} كيلوواط ساعة من الكهرباء.`,
+        () => `<strong>المنازل:</strong> يستهلك المنزل في تركيا نحو ${fmt(HOME_KWH)} كيلوواط ساعة من الكهرباء سنويًا.`,
+        () => `<strong>الفحم وثاني أكسيد الكربون:</strong> ينتج طن واحد من الفحم نحو ${fmt(COAL_KWH_PER_T)} كيلوواط ساعة. تُطلق محطات الفحم نحو 820 غ من ثاني أكسيد الكربون لكل كيلوواط ساعة على مدى دورة حياتها، مقابل نحو 12 غ للطاقة النووية (IPCC).`,
+        () => `الأرقام تقريبية، والهدف منها إعطاء فكرة عن الحجم.`
+      ]
     }
   };
 
   let lang = "en";
-  try { lang = localStorage.getItem("n4c-lang") || ((navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en"); } catch (e) {
-    lang = (navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en";
+  const sys = (navigator.language || "").toLowerCase();
+  const guess = sys.startsWith("tr") ? "tr" : sys.startsWith("ar") ? "ar" : "en";
+  try { lang = localStorage.getItem("n4c-lang") || guess; if (!T[lang]) lang = guess; } catch (e) {
+    lang = guess;
   }
   let sweet = null, n = 1;
   const shown = { homes: 0, coal: 0, co2: 0 };
 
   function fmt(x, d = 0) {
-    return new Intl.NumberFormat(lang === "tr" ? "tr-TR" : "en-GB", { maximumFractionDigits: d, minimumFractionDigits: d }).format(x);
+    return new Intl.NumberFormat(lang === "tr" ? "tr-TR" : lang === "ar" ? "ar-u-nu-latn" : "en-GB", { maximumFractionDigits: d, minimumFractionDigits: d }).format(x);
   }
   const $ = id => document.getElementById(id);
 
@@ -362,9 +403,12 @@ details li strong{color:var(--fg);font-weight:600}
   function applyText() {
     const t = T[lang];
     document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.querySelectorAll("[data-name]").forEach(el => el.textContent = t.names[el.dataset.name]);
     document.querySelectorAll("[data-t]").forEach(el => { const v = t[el.dataset.t]; if (typeof v === "string") el.textContent = v; });
     $("lang-tr").setAttribute("aria-pressed", lang === "tr");
     $("lang-en").setAttribute("aria-pressed", lang === "en");
+    $("lang-ar").setAttribute("aria-pressed", lang === "ar");
     if (sweet) renderSim(false);
   }
 
@@ -410,7 +454,8 @@ details li strong{color:var(--fg);font-weight:600}
     $("countLabel").textContent = t.countLabel(n, sweet);
     $("pre").innerHTML = t.pre(n, sweet);
     $("minus").disabled = n <= 1;
-    $("sweetName").textContent = sweet === "lokum" ? "Lokum" : "Baklava";
+    $("sweetName").textContent = t.names[sweet];
+    document.querySelector("[data-t=homesUnit]").textContent = t.homesUnitFn ? t.homesUnitFn(homes) : t.homesUnit;
     $("sweetWeight").textContent = t.sweetW(s.sweetG);
     $("fuelWeight").textContent = t.fuelW(fmt(Math.round(s.fuelG / 10) * 10));
     animate("homes", $("homes"), homes, 0);
