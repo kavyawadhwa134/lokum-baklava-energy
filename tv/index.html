@@ -37,6 +37,11 @@ section.wrap{height:auto;padding:0;gap:0;min-height:0}
 .brand b{color:var(--sky);font-weight:700}
 .brand svg{width:3.4rem;height:3.4rem}
 .controls{display:flex;align-items:center;gap:.8rem}
+.apps{display:flex;gap:.3rem;background:var(--surface);border:.12rem solid var(--line);border-radius:999px;padding:.25rem}
+.apps a{display:inline-flex;align-items:center;gap:.5rem;height:2.7rem;padding:0 1.1rem;border-radius:999px;font-weight:700;font-size:1.15rem;color:var(--navy);text-decoration:none;white-space:nowrap}
+.apps a svg{width:1.3rem;height:1.3rem}
+.apps a:hover{background:var(--panel)}
+.apps a[aria-current="page"]{background:var(--sky);color:#fff}
 .lang{display:flex;border:.12rem solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
 .lang button{border:0;background:none;min-width:4.4rem;height:3rem;padding:0 1.1rem;font-weight:600;font-size:1.25rem;color:var(--muted)}
 .lang button[aria-pressed="true"]{background:var(--navy);color:var(--btn-fg)}
@@ -146,6 +151,11 @@ section.wrap{height:auto;padding:0;gap:0;min-height:0}
       <svg viewBox="0 0 200 200" aria-hidden="true" class="mini-rings"></svg>
       <span><b data-t="brand1"></b><br><span data-t="brand2"></span></span>
     </button>
+    <nav class="apps" aria-label="Booth apps">
+      <a href="https://kavyawadhwa134.github.io/n4c-flight-radiation/" data-app><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12c0-.8-.7-1.4-1.5-1.4H15L10 3H8l2.5 7.6H6L4.4 8.5H3l1 3.5-1 3.5h1.4L6 13.4h4.5L8 21h2l5-7.6h4.5c.8 0 1.5-.6 1.5-1.4z" fill="currentColor"/></svg><span data-x="appFlight"></span></a>
+      <a href="https://kavyawadhwa134.github.io/lokum-baklava-energy/tv/" aria-current="page" data-app><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="2"/></svg><span data-x="appLokum"></span></a>
+      <a href="https://kavyawadhwa134.github.io/n4c-quiz-wheel/" data-app><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" stroke="currentColor" stroke-width="1.4"/></svg><span data-x="appQuiz"></span></a>
+    </nav>
     <div class="controls">
       <div class="lang" role="group" aria-label="Language">
         <button type="button" id="lang-tr" data-lang="tr">TR</button>
@@ -559,13 +569,13 @@ section.wrap{height:auto;padding:0;gap:0;min-height:0}
   const $ = id => document.getElementById(id);
   const PHONE_URL = "https://kavyawadhwa134.github.io/lokum-baklava-energy/";
   const X = {
-    en: { auto: "Auto play", full: "Full screen", phone: "Try it on your phone",
+    en: { appFlight: "Flight radiation", appLokum: "Lokum & Baklava", appQuiz: "Quiz wheel", auto: "Auto play", full: "Full screen", phone: "Try it on your phone",
           keys: "Keyboard: + and − change the count · L lokum · B baklava · P auto play · F full screen · Esc start",
           foot: "Assumes a typical reactor, 33% of the heat turned into electricity and 2,400 kWh per Turkish home per year. CO₂: IPCC life-cycle medians, coal 820 g vs nuclear 12 g per kWh." },
-    tr: { auto: "Otomatik oynat", full: "Tam ekran", phone: "Telefonunda dene",
+    tr: { appFlight: "Uçuş radyasyonu", appLokum: "Lokum & Baklava", appQuiz: "Bilgi çarkı", auto: "Otomatik oynat", full: "Tam ekran", phone: "Telefonunda dene",
           keys: "Klavye: + ve − sayıyı değiştirir · L lokum · B baklava · P otomatik oynat · F tam ekran · Esc başa dön",
           foot: "Tipik bir reaktör, ısının %33'ünün elektriğe dönüşmesi ve Türkiye'de hane başına yılda 2.400 kWh varsayılmıştır. CO₂: IPCC yaşam döngüsü medyanları, kWh başına kömür 820 g, nükleer 12 g." },
-    ar: { auto: "تشغيل تلقائي", full: "ملء الشاشة", phone: "جرّبها على هاتفك",
+    ar: { appFlight: "إشعاع الطيران", appLokum: "لوكوم وبقلاوة", appQuiz: "عجلة الأسئلة", auto: "تشغيل تلقائي", full: "ملء الشاشة", phone: "جرّبها على هاتفك",
           keys: "لوحة المفاتيح: + و − لتغيير العدد · L لوكوم · B بقلاوة · P تشغيل تلقائي · F ملء الشاشة · Esc البداية",
           foot: "نفترض مفاعلًا نموذجيًا، وتحويل 33% من الحرارة إلى كهرباء، واستهلاك 2,400 كيلوواط ساعة لكل منزل تركي سنويًا. ثاني أكسيد الكربون: متوسطات دورة الحياة من IPCC، الفحم 820 غ مقابل 12 غ للنووي لكل كيلوواط ساعة." }
   };
@@ -575,6 +585,12 @@ section.wrap{height:auto;padding:0;gap:0;min-height:0}
   };
   new MutationObserver(applyX).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   applyX();
+
+  // Keep the language when switching to another booth app
+  document.querySelectorAll("[data-app]").forEach(a => a.addEventListener("click", () => {
+    const l = document.documentElement.lang;
+    try { localStorage.setItem("n4c-flight-lang", JSON.stringify(l)); localStorage.setItem("n4c-wheel-lang", JSON.stringify(l)); } catch (e) {}
+  }));
 
   // QR code
   try {
